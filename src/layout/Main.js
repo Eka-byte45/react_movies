@@ -1,11 +1,28 @@
 import "./Main.css";
-
-function Main()
+import React from "react"
+import MovieList from "../components/MovieList";
+class Main extends React.Component
 {
-	return (
-		<div className="main">
-			
-		</div>
-	);
+	state =
+	{
+		movies:[]
+
+	}
+	componentDidMount()
+	{
+		fetch('https://www.omdbapi.com/?s=matrix&apikey=94dbc433')
+			.then(responce => responce.json())
+			.then(data => this.setState({movies:data.Search}));
+	}
+
+	render()
+	{
+		return (
+			<div className="main">
+				<MovieList movies={this.state.movies} />
+			</div>
+		)
+	}
+	
 }
 export default Main;
