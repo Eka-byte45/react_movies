@@ -25,27 +25,43 @@ class Search extends React.Component
 	{
 		this.setState
 		(
-			() => ({ type:		event.target.dataset.type }),
-			() => ({ search: this.props.searchMovie(this.state.search, this.state.type) }),
+			() => ({ type: event.target.dataset.type, page:1 }),
+			() => ({ search: this.props.searchMovie(this.state.search, this.state.type) })
 			
 		)
 	}
 
 	prevPage = () =>
 	{
-		this.setState
-		(
-			() => (this.state.page > 1 ? { page: this.state.page - 1 } : { page: 1 }),
-			() => {this.props.searchMovie(this.state.search,this.state.type,this.state.page)}
-		)
+		if (this.state.page > 1) {
+			this.setState(
+				(prevState) => ({ page: prevState.page - 1 }),
+				() => this.props.searchMovie(this.state.search, this.state.type, this.state.page)
+			);
+		}
+		//this.setState
+		//(
+		//	() => (this.state.page > 1 ? { page: this.state.page - 1 } : { page: 1 }),
+		//	() => {this.props.searchMovie(this.state.search,this.state.type,this.state.page)}
+		//)
 	}
 	nextPage = () =>
 	{
-		this.setState
-		(
-			() => ({ page: this.state.page + 1 }),
-			() => {this.props.searchMovie(this.state.search,this.state.type,this.state.page) }
-		)
+		const totalPages = Math.ceil(this.props.totalCount / 10);
+		if (this.state.page < totalPages)
+		{
+			this.setState(
+				(prevState) => ({ page: prevState.page + 1 }),
+				() => {
+					this.props.searchMovie(this.state.search, this.state.type, this.state.page);
+				}
+			)
+		}
+		//this.setState
+		//(
+		//	() => ({ page: this.state.page + 1 }),
+		//	() => {this.props.searchMovie(this.state.search,this.state.type,this.state.page) }
+		//)
 	}
 	setPage = (pageNumber) =>
 	{
@@ -74,12 +90,15 @@ class Search extends React.Component
 					/>
 					<button className="btn"
 						onClick=
-						{() => {
-							() => this.props.searchMovie(this.state.search, this.state.type)
+						{
+							() =>
+							{
+								this.props.searchMovie(this.state.search, this.state.type)
+								this.setState({ page: 1 });
+							}
 
 						}
-						}
-					>
+						>
 						&#128269;
 					</button>
 				</div>
@@ -122,32 +141,37 @@ class Search extends React.Component
 					<label htmlFor="radio-game">Games</label>
 					
 				</div>
+
 				<div className="pagination">
-					<button className="btn" onClick={this.prevPage}>
+					<button className="btn" onClick={this.prevPage}
+						disabled={this.state.page <= 1}
+					>
 						Prev
 					</button>
-				</div>
-				<div className="items">
-					{
-						number.slice(0, totalPages)
-						.map
-						(
-							(element, index) =>
-							(
-								<button className={element == this.state.page ? "btn-current-page" : ""}
-									onClick={() => (this.setPage(element))}
-								>
-									{element }
-								</button>
-							)
-						)
-					}
-				</div>
-				<div className="pagination">
-					<button className="btn" onClick={this.nextPage}>
+					<div className="items">
+						{
+							number.slice(0, totalPages)
+								.map
+								(
+									(element, index) =>
+									(
+										<button className={element == this.state.page ? "btn-current-page" : ""}
+											onClick={() => (this.setPage(element))}
+										>
+											{element}
+										</button>
+									)
+								)
+						}
+					</div>
+					<button className="btn" onClick={this.nextPage}
+						disabled={this.state.page >= Math.ceil(this.props.totalCount/10) }
+					>
 						Next
 					</button>
+					
 				</div>
+
 			</>
 
 		)
